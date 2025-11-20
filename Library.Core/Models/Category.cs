@@ -1,4 +1,4 @@
-﻿namespace library
+﻿namespace library.Core.Models
 {
     public class Category
     {

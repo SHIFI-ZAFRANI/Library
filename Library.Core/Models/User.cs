@@ -1,4 +1,4 @@
-﻿namespace library
+﻿namespace library.Core.Models
 {
     public class User
     {
@@ -7,6 +7,6 @@
 
         public String email { get; set; }
         public String phone { get; set; }
-        public User() {
+        public User() { }
     }
 }
