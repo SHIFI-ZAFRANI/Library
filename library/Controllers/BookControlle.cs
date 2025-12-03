@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using library.Core.Models;
+using Library.Core.Services;
+using Library.Service;
+using Microsoft.AspNetCore.Mvc;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace library.Controllers
@@ -8,23 +10,23 @@ namespace library.Controllers
     [ApiController]
     public class BookControlle : ControllerBase
     {
-        private readonly IDataContext _Context;
-        public BookControlle(IDataContext context)
+        private readonly IBookServices _bookService;
+        public BookControlle(IBookServices context)
         {
-            _Context = context;
+            _bookService = context;
         }
         // GET: api/<BookControlle>
         [HttpGet]
-        public IEnumerable<Book> Get()
+        public ActionResult Get()
         {
-            return _Context.Books;
+            return Ok(_bookService.GetBooks());
         }
 
         // GET api/<BookControlle>/5
         [HttpGet("{id}")]
         public ActionResult Get(int id)
         {
-            var e = _Context.Books.Find(x => x.id == id);
+            var e = _bookService.GetBookById( id);
             if (e != null)
             {
                 return Ok(e);
@@ -36,29 +38,35 @@ namespace library.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] Book value)
         {
-            var e = _Context.Books.Find(x => x.id == value.id);
+            var e = _bookService.GetBookById(value.Id);
             if (e != null)
             {
-                return Conflict(); // BadRequest
+                return Conflict(); 
             }
-            _Context.Books.Add(value);
-            return Ok(value);
+            e=_bookService.PostBook(value);
+            return Ok(e);
         }
 
         // PUT api/<BookControlle>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] Book value)
         {
-            var index=_Context.Books.FindIndex(x => x.id==id);
-            _Context.Books[index].nameBook = value.nameBook;
+            var index=_bookService.GetBooks().FindIndex(x => x.Id==id);
+            _bookService.GetBooks()[index].Id=value.Id;
+            _bookService.GetBooks()[index].nameBook=value.nameBook;
         }
 
         // DELETE api/<BookControlle>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ActionResult Delete(int id)
         {
-            var e = _Context.Books.Find(x => x.id == id);
-            _Context.Books.Remove(e);
+            var e = _bookService.GetBookById(id);
+            if (e != null)
+            {
+                return Conflict();
+            }
+            _bookService.DeleteBook(id);
+            return Ok(e);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace library
+﻿using library.Core.Models;
+
+namespace library
 {
     public interface IDataContext
     {
