@@ -1,7 +1,11 @@
-﻿using library.Core.Models;
+﻿using AutoMapper;
+using library.Core.Models;
+using library.Models;
+using Library.Core.DTO;
 using Library.Core.Services;
 using Library.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace library.Controllers
@@ -11,61 +15,74 @@ namespace library.Controllers
     public class BookControlle : ControllerBase
     {
         private readonly IBookServices _bookService;
-        public BookControlle(IBookServices context)
+        private readonly IMapper _mapper;
+        public BookControlle(IBookServices context,IMapper mapper)
         {
             _bookService = context;
+            _mapper = mapper;
+
         }
         // GET: api/<BookControlle>
         [HttpGet]
-        public ActionResult Get()
+        public async Task< ActionResult> Get()
         {
-            return Ok(_bookService.GetBooks());
+            var books=await _bookService.GetBooksAsync();
+            return Ok(_mapper.Map<List<BookDTO>>(books));
         }
 
         // GET api/<BookControlle>/5
         [HttpGet("{id}")]
-        public ActionResult Get(int id)
+        public async Task< ActionResult> Get(int id)
         {
-            var e = _bookService.GetBookById( id);
+            var e =await _bookService.GetBookByIdAsync( id);
             if (e != null)
             {
-                return Ok(e);
+                var book= _mapper.Map< BookDTO >(e);
+                return Ok(book);
             }
             return NotFound();
         }
 
         // POST api/<BookControlle>
         [HttpPost]
-        public ActionResult Post([FromBody] Book value)
+        public async Task< ActionResult> Post([FromBody] BookPostModel value)
         {
-            var e = _bookService.GetBookById(value.Id);
-            if (e != null)
+            var book1 = _bookService.GetBookByIdAsync(value.Id);
+            if (book1 == null)
             {
-                return Conflict(); 
+                var book = _mapper.Map<Book>(value);
+                var e =await _bookService.PostBookAsync(book);
+                return Ok(e);
+
             }
-            e=_bookService.PostBook(value);
-            return Ok(e);
+            return Conflict();  
         }
 
         // PUT api/<BookControlle>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Book value)
+        public async Task<ActionResult> Put(int id, [FromBody] Book value)
         {
-            var index=_bookService.GetBooks().FindIndex(x => x.Id==id);
-            _bookService.GetBooks()[index].Id=value.Id;
-            _bookService.GetBooks()[index].nameBook=value.nameBook;
+            var index=await _bookService.GetBookByIdAsync(value.Id);
+            if (index == null)
+            {
+                return BadRequest();
+
+            }
+            await _bookService.PutBookAsync( value);
+            return Ok();    
+
         }
 
         // DELETE api/<BookControlle>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task< ActionResult >Delete(int id)
         {
-            var e = _bookService.GetBookById(id);
-            if (e != null)
+            var e =await _bookService.GetBookByIdAsync(id);
+            if (e == null)
             {
-                return Conflict();
+                return BadRequest();
             }
-            _bookService.DeleteBook(id);
+           await _bookService.DeleteBookAsync(id);
             return Ok(e);
         }
     }

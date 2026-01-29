@@ -1,6 +1,7 @@
 ﻿using library.Core.Models;
 using Library.Core.Repositories;
 using Library.Core.Services;
+using Library.Data.Repoistories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +18,36 @@ namespace Library.Service
         {
             _categoryRepositor = category;
         }
-        public List<Category> GetCategory()
+        public async Task<List<Category>> GetCategoryAsync()
         {
-            return _categoryRepositor.GetCategory();
+            return await _categoryRepositor.GetCategoryAsync();
         }
 
-        public Category GetCategoryById(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            return _categoryRepositor.GetCategoryById(id);
+            return await _categoryRepositor.GetCategoryByIdAsync(id);
         }
 
-        public Category PostCategory(Category category)
-        {
-            return _categoryRepositor.PostCategory(category);
+        public async Task< Category> PostCategoryAsync(Category category)
+        {  
+            var c= _categoryRepositor.PostCategory(category);
+           await _categoryRepositor.SaveAsync();
+            return c;
+
+          
         }
-        public void putCategory(Category category)
+        public async Task putCategoryAsync(Category category)
         {
 
-            _categoryRepositor.PutCategory(category);
+            await _categoryRepositor.PutCategoryAsync(category);
+            await _categoryRepositor.SaveAsync();
         }
 
-        public void deleteCategory(int id)
+        public async Task deleteCategoryAsync(int id)
         {
-            _categoryRepositor.DeleteCategory(id);
+           await _categoryRepositor.DeleteCategoryAsync(id);
+
+          await  _categoryRepositor.SaveAsync();
         }
     }
 }

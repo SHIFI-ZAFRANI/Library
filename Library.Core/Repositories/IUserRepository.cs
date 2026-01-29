@@ -9,10 +9,11 @@ namespace Library.Core.Repositories
 {
     public interface IUserRepository
     {
-        public List<User> GetUsers();
-        public User GetUserById(int id);
+        public Task< List<User>> GetUsersAsync();
+        public Task< User> GetUserByIdAsync(int id);
         public User PostUser(User user);
-        public void PutUser(User user);
-        public void DeleteUser(int id);
+        public Task<User> PutUserAsync(User user);
+        public Task DeleteUserAsync(int id);
+        public Task SaveAsync();
     }
 }

@@ -10,10 +10,10 @@ namespace Library.Core.Services
     public interface ICategoryServices
     {
 
-        public List<Category> GetCategory();
-        public Category GetCategoryById(int id);
-        public Category PostCategory(Category category);
-        public void putCategory(Category category);
-        public void deleteCategory(int id);
+        public Task< List<Category>> GetCategoryAsync();
+        public  Task< Category> GetCategoryByIdAsync(int id);
+        public Task< Category> PostCategoryAsync(Category category);
+        public Task<Category> putCategoryAsync(Category category);
+        public Task deleteCategoryAsync(int id);
     }
 }

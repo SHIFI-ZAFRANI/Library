@@ -9,25 +9,50 @@ using System.Threading.Tasks;
 
 namespace Library.Data.Repoistories
 {
-    public class UserRepository :IUserRepository
+    public class UserRepository : IUserRepository
     {
-        private readonly DataContext _userRepository;
+        private readonly DataContext _context;
         public UserRepository(DataContext context)
         {
-            _userRepository = context;
+            _context = context;
         }
-        public List<User> GetUsers()
+        public async Task<List<User>> GetUsersAsync()
         {
-            return _userRepository.Users;
+            return await _context.Users.ToListAsync()  ;
         }
 
-        public User GetUserById(int id)
+        public async Task< User> GetUserByIdAsync(int id)
         {
-            return _userRepository.Users.Find(s => s.password == id);
+            return await _context.Users.ToList().FirstOrDefaultAsync(s => s.password == id);
         }
 
-       
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+        public  User PostUser(User user) {
+            _context.Users.Add(user);
+            return user;
+
+        }
+        public async Task<User> PutUserAsync(User user)
+        {
+            var u =await GetUserByIdAsync(user.password);
+            u.password = user.password;
+            u.phone = user.phone;
+            u.email = user.email;
+            u.name = user.name;
+            return u;
+
+        }
+        public async Task DeleteUserAsync(int id)
+        {
+            var index =await GetUserByIdAsync(id);
+            _context.Users.Remove(index);
+        }
+
     }
+ 
 }
-//public List<User> GetUsers();
-//public User GetUserById(int id);
+

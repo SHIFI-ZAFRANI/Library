@@ -20,29 +20,35 @@ namespace Library.Data.Repoistories
         {
             _category = context;
         }
-        public List<Category> GetCategory()
+        public async Task<List<Category>> GetCategoryAsync()
         {
-            return _category.Categories;
+            return await _category.Categories.ToListAsync()    ;
         }
-
-        public Category GetCategoryById(int id)
+        public async Task SaveAsync()
         {
-            return _category.Categories.Find(s => s.idCategory == id);
+            await _category.SaveChangesAsync();
         }
-        public Category PostCategory(Category category) {
+        public async Task< Category> GetCategoryByIdAsync(int id)
+        {
+            return await _category.Categories.ToList().FirstOrDefaultAsync(s => s.idCategory == id);
+        }
+        public  Category PostCategory(Category category) {
             _category.Categories.Add(category);
             return category;
         }
-        public void PutCategory(Category category) {
+        public async Task<Category> PutCategoryAsync(Category category) {
 
-            var index = category.idCategory;
-            _category.Categories[index].nameCategory = category.nameCategory;
-            _category.Categories[index].idCategory = category.idCategory;
+            var index = await GetCategoryByIdAsync(category.idCategory);
+            index.nameCategory = category.nameCategory;
+            index.idCategory = category.idCategory;
+            return index;
+
             
         }
-        public void DeleteCategory(int id) { 
-            var index=_category.Categories.FindIndex(s => s.idCategory == id);
-            _category.Categories.RemoveAt(index);
+        public async Task DeleteCategoryAsync(int id) { 
+            var index=  await GetCategoryByIdAsync(id);
+            _category.Categories.Remove(index);
+            
         }
 
 

@@ -1,4 +1,5 @@
 using library;
+using Library.Core;
 using Library.Core.Repositories;
 using Library.Core.Services;
 using Library.Data.Repoistories;
@@ -17,12 +18,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
 builder.Services.AddScoped<IBookServices, BookService>();
 builder.Services.AddScoped<IUserServices, UserService>();
 builder.Services.AddScoped<ICategoryServices, CategoryService>();
 
 
-builder.Services.AddSingleton<DataContext>();
+builder.Services.AddDbContext<DataContext>();
+builder.Services.AddAutoMapper(typeof(MappingProfile), typeof(MappingPostModel));
 //var policy = "policy";
 //builder.Services.AddCors(options =>
 //{

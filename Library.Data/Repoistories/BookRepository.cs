@@ -1,6 +1,7 @@
 ﻿using library;
 using library.Core.Models;
 using Library.Core.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,33 +17,43 @@ namespace Library.Data.Repoistories
         {
             _bookRepository = context;
         }
-        public List<Book> GetBooks()
+        public async Task<List<Book>> GetBooksAsync()
         {
-            return _bookRepository.Books;
+            return await _bookRepository.Books.Include(s => s.Category).ToListAsync();
         }
 
-        public Book GetBookById(int id)
+        public async Task<Book> GetBookByIdAsync(int id)
         {
-            return _bookRepository.Books.Find(s => s.Id == id);
-        }
-        public Book PostRecipient(Book recipient)
-        {
-            _bookRepository.Books.Add(recipient);
-            return recipient;
+            return await _bookRepository.Books.FirstOrDefaultAsync(s => s.Id == id);
         }
 
-        public void PutBook(Book book)
+
+
+        public Book PostBook(Book book)
         {
-            var index = book.Id;
-            _bookRepository.Books[index].nameBook = book.nameBook;
-         
+            _bookRepository.Books.Add(book);
+            return book;
         }
 
-        public void DeleteBook(int id)
+        public async Task<Book> PutBookAsync(Book book)
         {
-            var index = _bookRepository.Books.FindIndex(r => r.Id == id);
-            _bookRepository.Books.RemoveAt(index);
+            var index = await GetBookByIdAsync(book.Id);
+            index.nameBook = book.nameBook;
+            return index;
+
         }
 
-    } 
+        public async Task DeleteBookAsync(int id)
+        {
+            var book = await GetBookByIdAsync(id);
+            _bookRepository.Books.Remove(book);
+
+
+        }
+        public async Task SaveAsync()
+        {
+            await _bookRepository.SaveChangesAsync();
+        }
+
+    }
 }

@@ -9,10 +9,11 @@ namespace Library.Core.Repositories
 {
     public interface ICategoryRepository
     {
-        public List<Category> GetCategory();
-        public Category GetCategoryById(int id);
+        public Task<List<Category>> GetCategoryAsync();
+        public Task <Category> GetCategoryByIdAsync(int id);
         public Category PostCategory(Category category);
-        public void DeleteCategory(int id);
-        public void PutCategory(Category category);
+        public Task DeleteCategoryAsync(int id);
+        public Task<Category> PutCategoryAsync(Category category);
+        public Task SaveAsync();
     }
 }

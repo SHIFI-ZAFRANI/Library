@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace library.Core.Models
+namespace library.Models
 {
-    public class Category
+    public class CategoryPostModel
     {
         [Key]
         public int idCategory { get; set; }
         public String nameCategory { get; set; }
-        public  List<Book> Books { get; set; }
-
     }
 }

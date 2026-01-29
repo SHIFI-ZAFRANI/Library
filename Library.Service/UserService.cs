@@ -1,6 +1,7 @@
 ﻿using library.Core.Models;
 using Library.Core.Repositories;
 using Library.Core.Services;
+using Library.Data.Repoistories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +18,34 @@ namespace Library.Service
         {
             _userRepositor = userRepository;
         }
-        public User GetUserById(int id)
+        public async Task< User> GetUserByIdAsync(int id)
         {
-            return _userRepositor.GetUserById(id);
+            return await _userRepositor.GetUserByIdAsync(id);
         }
 
-        public List<User> GetUsers()
+        public Task< List<User>> GetUsersAsync()
         {
-            return _userRepositor.GetUsers();
+            return _userRepositor.GetUsersAsync();
         }
 
-        public User PostUser(User user)
+        public async Task< User> PostUserAsync(User user)
         {
-            return _userRepositor.PostUser(user);
+            var u= _userRepositor.PostUser(user);
+            await _userRepositor.SaveAsync();
+            return u;
         }
-        public void PutUser(User user)
+        public async Task PutUser(User user)
         {
 
-            _userRepositor.PutUser(user);
+            await _userRepositor.PutUserAsync(user);
+           await _userRepositor.SaveAsync();
         }
 
-        public void DeleteUser(int id)
+        public async void DeleteUser(int id)
         {
-            _userRepositor.DeleteUser(id);
+          await  _userRepositor.DeleteUserAsync(id);
+
+           await _userRepositor.SaveAsync();
         }
     }
 }

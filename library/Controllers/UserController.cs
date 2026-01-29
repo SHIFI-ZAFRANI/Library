@@ -1,5 +1,10 @@
-﻿using library.Core.Models;
+﻿using AutoMapper;
+using library.Controllers;
+using library.Core.Models;
+using library.Models;
+using Library.Core.DTO;
 using Library.Core.Services;
+using Library.Service;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -11,22 +16,25 @@ namespace library.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserServices _userServices;
-        public UserController(IUserServices _userServices)
+        private readonly IMapper _mapper;
+        public UserController(IUserServices userServices,IMapper mapper)
         {
-            _userServices = _userServices;
+            _userServices = userServices;
+            _mapper = mapper;
         }
         // GET: api/<UserController>
         [HttpGet]
-        public ActionResult Get()
+        public async Task< ActionResult> Get()
         {
-            return Ok(_userServices.GetUsers());
+            var students =await _userServices.GetUsersAsync();
+            return Ok(_mapper.Map<List<UserDTO>>(students));
         }
 
         // GET api/<CategoryController>/5
         [HttpGet("{id}")]
-        public ActionResult Get(int id)
+        public async Task< ActionResult> Get(int id)
         {
-            var e = _userServices.GetUserById(id);
+            var e =await _userServices.GetUserByIdAsync(id);
             if (e != null)
             {
                 return Ok(e);
@@ -36,41 +44,54 @@ namespace library.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public ActionResult Post([FromBody] User value)
+        public async Task< ActionResult> Post([FromBody] UserPostModel value)
         {
-            var e = _userServices.GetUserById(value.password);
+            var e = _userServices.GetUserByIdAsync(value.password);
             if (e != null)
             {
-                return Conflict();
+                var student = _mapper.Map<User>(value);
+                var s =await _userServices.PostUserAsync(student);
+                return Ok(s);
+               
             }
-            e = _userServices.PostUser(value);
-           return Ok(e);
+          
+
+           return Conflict();
 
 
         }
 
+
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] User value)
+        public async Task<ActionResult> Put(int id, [FromBody] User value)
         {
-            var index = _userServices.GetUsers().FindIndex(x=>x.password == id);
-            _userServices.GetUsers()[index].password=value.password;
-            _userServices.GetUsers()[index].email=value.email;
-            _userServices.GetUsers()[index].phone=value.phone;
-            _userServices.GetUsers()[index].name=value.name;
+            var u =await _userServices.GetUserByIdAsync(id);
+            if (u != null)
+            {
+                return BadRequest();
+            }
+            await _userServices.PutUserAsync(u);
+            return Ok();    
+
+           
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task< ActionResult> Delete(int id)
         {
-            var p = _userServices.GetUserById(id);
-            if (p != null)
+            var p = _userServices.GetUserByIdAsync(id);
+            if (p == null)
             {
-                return Conflict();
+                return BadRequest();
             }
-            _userServices.DeleteUser(id);
+          await  _userServices.DeleteUserAsync(id);
             return Ok(p);
         }
     }
 }
+
+
+
+

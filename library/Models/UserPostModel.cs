@@ -1,18 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace library.Core.Models
+namespace library.Models
 {
-    public class User
+    public class UserPostModel
     {
         public String name { get; set; }
         [Key]
         public int password { get; set; }
-        
+
         public String email { get; set; }
         public String phone { get; set; }
-
-        public List<Book> Books { get; set; }
-        public User() { }
-
     }
 }

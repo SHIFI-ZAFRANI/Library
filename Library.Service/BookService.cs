@@ -12,28 +12,36 @@ namespace Library.Service
         {
             _bookRepositor = bookRepository;
         }
-        public Book GetBookById(int id)
+        public async Task<Book> GetBookByIdAsync(int id)
         {
-           
-            return _bookRepositor.GetBookById(id);
+
+            return await _bookRepositor.GetBookByIdAsync(id);
         }
 
-        public List<Book> GetBooks()
+        public async Task<List<Book>> GetBooksAsync()
         {
-            return _bookRepositor.GetBooks();   
+            return await _bookRepositor.GetBooksAsync();
         }
 
-        public Book PostBook(Book book)
+        public async Task<Book> PostBookAsync(Book book)
         {
-            return _bookRepositor.PostBook(book);
-            
+            var b = _bookRepositor.PostBook(book);
+            await _bookRepositor.SaveAsync();
+            return b;
+
         }
-        public void PutBook(Book book) {
-            _bookRepositor.PutBook(book);
-        }
-        public void DeleteBook(int id)
+        public void PutBookAsync(Book book)
         {
-            _bookRepositor.DeleteBook(id);
+            _bookRepositor.PutBookAsync(book);
+            _bookRepositor.SaveAsync();
+        }
+        public void DeleteBookAsync(int id)
+        {
+            _bookRepositor.DeleteBookAsync(id);
+
+
+
+            _bookRepositor.SaveAsync();
         }
     }
 }

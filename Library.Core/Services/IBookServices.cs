@@ -11,12 +11,12 @@ namespace Library.Core.Services
     {
 
         
-        public List<Book> GetBooks();
-        public Book GetBookById(int id);
-        public Book PostBook(Book book);
+        public Task<List<Book>> GetBooksAsync();
+        public Task< Book> GetBookByIdAsync(int id);
+        public Task<Book> PostBookAsync(Book book);
     
-        public void DeleteBook(int id);
-        public void PutBook(Book book); 
+        public Task DeleteBookAsync(int id);
+        public Task<Book> PutBookAsync(Book book); 
 
 
     }

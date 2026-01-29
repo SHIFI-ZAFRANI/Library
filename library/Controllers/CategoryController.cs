@@ -1,4 +1,7 @@
-﻿using library.Core.Models;
+﻿using AutoMapper;
+using library.Core.Models;
+using library.Models;
+using Library.Core.DTO;
 using Library.Core.Services;
 using Library.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -12,24 +15,28 @@ namespace library.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryServices _categoryServices;
-        public CategoryController(ICategoryServices categoryServices)
+        private readonly IMapper _mapper;
+        public CategoryController(ICategoryServices categoryServices,IMapper mapper)
         {
             _categoryServices = categoryServices;
+            _mapper = mapper;
         }
         // GET: api/<CategoryController>
         [HttpGet]
-        public ActionResult Get()
+        public async Task< ActionResult> Get()
         {
-            return Ok(_categoryServices.GetCategory());
+            var categorys =await _categoryServices.GetCategoryAsync();
+            return Ok(_mapper.Map<List<CategoryDTO>>(categorys));
         }
 
         // GET api/<CategoryController>/5
         [HttpGet("{id}")]
-        public ActionResult Get(int id)
+        public async Task< ActionResult> Get(int id)
         {
-            var e = _categoryServices.GetCategoryById(id);
+            var e =await _categoryServices.GetCategoryByIdAsync(id);
             if (e != null)
             {
+                var stu = _mapper.Map<CategoryDTO>(e);
                 return Ok(e);
             }
             return NotFound();
@@ -37,37 +44,43 @@ namespace library.Controllers
 
         // POST api/<CategoryController>
         [HttpPost]
-        public ActionResult Post([FromBody] Category value)
+        public async Task< ActionResult> Post([FromBody] CategoryPostModel value)
         {
-            var e=_categoryServices.GetCategoryById(value.idCategory);
+            var e=_categoryServices.GetCategoryByIdAsync(value.idCategory);
             if (e != null)
             {
-                return Conflict();
+                var category = _mapper.Map<Category>(value);
+                var s =await _categoryServices.PostCategoryAsync(category);
+                return Ok();
             }
-            e = _categoryServices.PostCategory(value);
-            return Ok(e);
+         
+            return Conflict();
         }
 
         // PUT api/<CategoryController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Category value)
+        public async Task<ActionResult> Put(int id, [FromBody] Category value)
         {
-            var index=_categoryServices.GetCategory().FindIndex(x=>x.idCategory==id);
-            _categoryServices.GetCategory()[index].idCategory=value.idCategory;
-            _categoryServices.GetCategory()[index].nameCategory=value.nameCategory;
+            var index=await _categoryServices.GetCategoryByIdAsync(id);
+            if (index != null)
+            {
+                return BadRequest();
+            }
+           await _categoryServices.putCategoryAsync(index);
+           return Ok();
         }
 
         // DELETE api/<CategoryController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task< ActionResult> Delete(int id)
         {
-            var p = _categoryServices.GetCategoryById(id);
-            if (p != null)
+            var p =await _categoryServices.GetCategoryByIdAsync(id);
+            if (p == null)
             {
-                return Conflict();
+                return BadRequest();
             }
-            _categoryServices.deleteCategory(id);
-            return Ok(p);
+          await  _categoryServices.deleteCategoryAsync(id);
+            return Ok();
         }
     }
 }
